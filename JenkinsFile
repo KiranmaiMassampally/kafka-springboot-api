@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define any environment variables here, e.g.
+        MVN_HOME = tool name: 'Maven 3.8.5', type: 'maven'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/KiranmaiMassampally/kafka-springboot-api'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat "${MVN_HOME}/bin/mvn clean package -DskipTests=false"
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat "${MVN_HOME}/bin/mvn test"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Simple deployment example: copy jar to server or run locally
+                // Adjust to your environment!
+                bat 'cp target/your-app.jar /path/to/deploy/'
+
+                // Or run your app (for testing)
+                // sh 'java -jar target/your-app.jar &'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and deploy successful!'
+        }
+        failure {
+            echo 'Build or deploy failed!'
+        }
+    }
+}
